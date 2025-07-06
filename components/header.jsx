@@ -9,8 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -23,9 +21,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
+import { checkUser } from "@/lib/checkUser";
 
-export default function Header() {
+const Header = async() => {
+  await checkUser();
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
       <nav className="contianer mx-auto px-4 h-16 flex items-center justify-between">
@@ -49,21 +49,21 @@ export default function Header() {
             </Link>
 
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button>
+              <DropdownMenuTrigger asChild>
+                <Button className="flex items-center gap-2">
                   <StarsIcon className="h-4 w-4" />
                   <span className="hidden md:block">Growth Tools</span>
                   <ChevronDown />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href={"/resume"} className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
                     <span>Build Resume</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link
                     href={"/ai-cover-letter"}
                     className="flex items-center gap-2"
@@ -72,7 +72,7 @@ export default function Header() {
                     <span>Cover Letter</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link href={"/interview"} className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
                     <span>Interview Prep</span>
@@ -102,3 +102,5 @@ export default function Header() {
     </header>
   );
 }
+
+export default Header;
