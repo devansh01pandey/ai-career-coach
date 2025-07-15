@@ -21,7 +21,7 @@ export async function updateUser(data) {
   // Uses a Prisma transaction to ensure all operations happen atomically.
   try {
     const result = await db.$transaction(
-      async () => {
+      async (tx) => {
         // find if the industry exists
         let industryInsight = await tx.industryInsights.findUnique({
           where: {
@@ -45,7 +45,7 @@ export async function updateUser(data) {
           });
         }
         // update the user
-        const updateUser = await tx.user.update({
+        const updatedUser = await tx.user.update({
           where: {
             id: user.id,
           },
@@ -57,7 +57,7 @@ export async function updateUser(data) {
           },
         });
 
-        return { updateUser, industryInsight };
+        return { updatedUser, industryInsight };
       },
       {
         timeout: 10000,
