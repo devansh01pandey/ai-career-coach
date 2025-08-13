@@ -3,6 +3,7 @@
 import { industries } from "@/data/industries";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { success } from "zod";
 
 export async function updateUser(data) {
   // Gets the logged-in user's ID from Clerk.
@@ -23,7 +24,7 @@ export async function updateUser(data) {
     const result = await db.$transaction(
       async (tx) => {
         // find if the industry exists
-        let industryInsight = await tx.industryInsights.findUnique({
+        let industryInsight = await tx.industryInsight.findUnique({
           where: {
             industry: data.industry,
           },
@@ -33,11 +34,11 @@ export async function updateUser(data) {
           industryInsight = await tx.industryInsight.create({
             data: {
               industry: data.industry,
-              salaryRange: [], // Default emoty array
+              salaryRanges: [], // Default emoty array
               growthRate: 0, // Default value
-              demandLevel: "Medium", // Default value
+              demandLevel: "MEDIUM", // Default value
               topSkills: [], // Default empty array
-              marketOutlook: "Neutral", // Default value
+              marketOutlook: "NEUTRAL", // Default value
               keyTrends: [], // Default empty array
               recommendedSkills: [], // Default empty array
               nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
@@ -63,9 +64,10 @@ export async function updateUser(data) {
         timeout: 10000,
       }
     );
+    return { success: true, ...result};
   } catch (error) {
     console.log("Error updating user and industry:", error.message);
-    throw new Error("Failed to update profile");
+    throw new Error("Failed to update profile" + error.message);
   }
 }
 

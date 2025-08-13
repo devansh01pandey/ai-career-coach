@@ -4,8 +4,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { Toaster } from "sonner";
 
-const inter = Inter({ subsets:["latin"] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Sensai AI Career Coach",
@@ -14,13 +15,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider appearance={{
-      baseTheme: dark
-    }}>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${inter.className} `}
-        >
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+      }}
+    >
+      <html lang="en" className="dark" suppressHydrationWarning>
+        <body className={`${inter.className} `}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -32,6 +33,9 @@ export default function RootLayout({ children }) {
 
             {/* main body */}
             <main className="min-h-screen">{children}</main>
+
+            {/* Toaster Implementatoin */}
+            <Toaster richColors/>
 
             {/* footer */}
             <footer className="bg-muted/50 py-12">

@@ -10,7 +10,7 @@ export const onboardingSchema = z.object({
   bio: z.string().max(500).optional(),
   experience: z
     .string()
-    .transform((val) => (val, 10))
+    .transform((val) => parseInt(val, 10))
     .pipe(
       z
         .number()
