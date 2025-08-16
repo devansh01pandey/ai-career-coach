@@ -4,6 +4,7 @@ import { industries } from "@/data/industries";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { success } from "zod";
+import { generateAIInsights } from "./dashboard";
 
 export async function updateUser(data) {
   // Gets the logged-in user's ID from Clerk.
@@ -30,18 +31,14 @@ export async function updateUser(data) {
           },
         });
         // if industry does not exist, create it with default values - will replace it with ai later
-        if (!industryInsight) {
-          industryInsight = await tx.industryInsight.create({
-            data: {
+        if(!industryInsight) {
+          const insights = await generateAIInsights(data.industry);
+
+          industryInsight = await db.industryInsight.create({
+            data:{
               industry: data.industry,
-              salaryRanges: [], // Default emoty array
-              growthRate: 0, // Default value
-              demandLevel: "MEDIUM", // Default value
-              topSkills: [], // Default empty array
-              marketOutlook: "NEUTRAL", // Default value
-              keyTrends: [], // Default empty array
-              recommendedSkills: [], // Default empty array
-              nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week from now
+              ...insights,
+              nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             },
           });
         }

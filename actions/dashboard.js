@@ -3,6 +3,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { includes } from "zod";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
@@ -35,6 +36,21 @@ export const generateAIInsights = async(industry) => {
         const text = response.text();
 
         const cleanedText = text.replace(/```(?:json)?\n/g, "").trim();
+        
+        let parsed;
+        try {
+          parsed = JSON.parse(cleanedText);
+        } catch (error) {
+          console.error("Failed to parse AI response:", cleanedText);
+          throw new Error("AI returned invalid JSON");
+        }
+
+        parsed.demandLevel = parsed.demandLevel?.toUpperCase();
+        parsed.marketOutlook = parsed.marketOutlook?.toUpperCase();
+
+        // console.log("AI Insights parsed response:", parsed);
+
+        return parsed;
 };
 
 export async function getIndustryInsights() {
@@ -45,14 +61,17 @@ export async function getIndustryInsights() {
     where: {
       clerkUserId: userId,
     },
+    include: {
+      industryInsight: true,
+    }
   });
 
   if (!user) throw new Error("User not found");
 
-  if(!user.IndustryInsight) {
+  if(!user.industryInsight) {
     const insights = await generateAIInsights(user.industry);
 
-    const industryInsight = await db.IndustryInsight.create({
+    const industryInsight = await db.industryInsight.create({
       data:{
         industry: user.industry,
         ...insights,
